@@ -1,0 +1,28 @@
+{
+  "name": "demo-qualite-calculatrice",
+  "version": "1.0.0",
+  "description": "Projet legacy pour formation qualité logicielle - Fonction monstrueuse",
+  "main": "dist/calculator.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "npm run build && node dist/calculator.js",
+    "dev": "nodemon --watch src --ext ts --exec \"npm run build && node dist/calculator.js\"",
+    "examples": "npm run build && node dist/examples.js",
+    "clean": "rm -rf dist"
+  },
+  "keywords": [
+    "legacy",
+    "refactoring",
+    "clean-code",
+    "formation",
+    "typescript"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "nodemon": "^3.0.0",
+    "typescript": "^5.0.0"
+  }
+}
