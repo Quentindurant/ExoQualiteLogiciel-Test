@@ -21,8 +21,8 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@types/node": "^20.0.0",
-    "nodemon": "^3.0.0",
-    "typescript": "^5.0.0"
+    "@types/node": "25.0.3",
+    "nodemon": "3.1.11",
+    "typescript": "5.9.3"
   }
 }
