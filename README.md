@@ -67,11 +67,18 @@ Ce code contient **TOUS** les défauts classiques d'un code legacy :
 ```
 demo-qualite-calculatrice/
 ├── package.json
-├── tsconfig.json         # Configuration TypeScript
+├── tsconfig.json              # Configuration TypeScript
 ├── src/
-│   ├── calculator.ts     # La fonction monstrueuse (TypeScript)
-│   └── examples.ts       # Exemples supplémentaires
-├── dist/                 # Fichiers compilés (généré par npm run build)
+│   ├── calculator/            # 📦 Logique métier (pure)
+│   │   ├── calculator.ts      #    La fonction monstrueuse
+│   │   ├── calculator.test.ts #    Tests unitaires
+│   │   └── examples.ts        #    Exemples supplémentaires
+│   └── web/                   # 🌐 Interface utilisateur
+│       └── legacy/            #    ❌ Version couplée (mauvais exemple)
+│           └── calculator-ui-legacy.ts
+├── public/                    # 🎨 Fichiers HTML
+│   └── index-legacy.html      #    Interface web legacy
+├── dist/                      # Fichiers compilés (généré par npm run build)
 └── README.md
 ```
 
@@ -112,8 +119,12 @@ npm start
 ```bash
 # Prérequis : Node.js 20+
 npm install
+```
 
-# Compiler et exécuter
+#### Mode console (fonction monstrueuse)
+
+```bash
+# Compiler et exécuter en console
 npm start
 
 # Mode développement (recompile automatiquement)
@@ -121,9 +132,33 @@ npm run dev
 
 # Exemples supplémentaires
 npm run examples
+```
 
+#### Mode web (exercice couplage UI)
+
+```bash
+# Lancer l'interface web legacy (version couplée)
+npm run start:web
+# Ouvre automatiquement http://localhost:8080/public/index-legacy.html
+
+# Mode développement web (recompile automatiquement)
+npm run dev:web
+```
+
+#### Autres commandes
+
+```bash
 # Compiler uniquement
 npm run build
+
+# Lancer les tests
+npm test
+
+# Tests avec interface UI
+npm run test:ui
+
+# Tests avec couverture de code
+npm run test:coverage
 
 # Nettoyer les fichiers compilés
 npm run clean
@@ -165,6 +200,117 @@ Utilisez la grille d'analyse pour lister tous les défauts :
 - Cas nominal : `2 + 3 = 5`
 - Cas limites : `0`, nombres négatifs, décimaux
 - Cas d'erreur : division par zéro, expression invalide
+
+### Exercice 4 : Découplage de l'interface web (Chapitre 7)
+
+**Objectif** : Séparer la logique métier de la manipulation DOM
+
+#### Version Legacy (fournie)
+
+La version `src/web/legacy/calculator-ui-legacy.ts` présente **tous les problèmes** de couplage :
+
+**Problèmes identifiés** :
+1. ❌ Variables globales (`calculationCount`, `lastResult`)
+2. ❌ Logique couplée au DOM (impossible à tester unitairement)
+3. ❌ Pas de séparation des responsabilités
+4. ❌ Effets de bord partout (`console.log`, manipulation DOM directe)
+5. ❌ Impossible de réutiliser sans navigateur
+
+#### Votre mission
+
+Créer une version **découplée** dans `src/web/refactored/` :
+
+**Étape 1 : Extraire la logique métier**
+
+Créer `src/web/refactored/calculator-logic.ts` avec des **fonctions pures** :
+
+```typescript
+// ✅ Logique pure (testable sans DOM)
+export function detectError(result: number, expression: string): boolean {
+  return result === 0 && expression !== "0" && !expression.includes("0 / 0");
+}
+
+export function formatResult(result: number, isError: boolean) {
+  if (isError) {
+    return { text: `❌ Erreur: ${result}`, className: 'error' };
+  }
+  return { text: `Résultat: ${result}`, className: 'success' };
+}
+
+export function validateExpression(expression: string): boolean {
+  return expression !== null && expression !== undefined && expression.trim() !== '';
+}
+```
+
+**Étape 2 : Créer l'interface découplée**
+
+Créer `src/web/refactored/calculator-ui-refactored.ts` :
+
+```typescript
+import { calc } from '../../calculator/calculator.js';
+import { detectError, formatResult, validateExpression } from './calculator-logic.js';
+
+let inputElement: HTMLInputElement;
+let resultElement: HTMLElement;
+
+function handleCalculation() {
+  const expression = inputElement.value;
+
+  if (!validateExpression(expression)) { /* ... */ }
+
+  const result = calc(expression);
+  const isError = detectError(result, expression);  // ✅ Fonction pure
+  const display = formatResult(result, isError);    // ✅ Fonction pure
+
+  resultElement.textContent = display.text;
+  resultElement.className = display.className;
+}
+
+function init() {
+  inputElement = document.getElementById('calc-input') as HTMLInputElement;
+  resultElement = document.getElementById('result')!;
+  document.getElementById('calc-button')!.addEventListener('click', handleCalculation);
+}
+```
+
+**Étape 3 : Comparer les deux versions**
+
+| Aspect | Legacy (couplée) | Refactored (découplée) |
+|--------|------------------|------------------------|
+| Tests unitaires | ❌ Impossible | ✅ Facile |
+| Réutilisabilité | ❌ Navigateur requis | ✅ Logique portable |
+| Maintenance | ❌ Difficile | ✅ Simple |
+| Responsabilités | ❌ Mélangées | ✅ Séparées (SRP) |
+| Logique métier | ❌ Couplée au DOM | ✅ Fonctions pures |
+
+**Étape 4 : Écrire des tests**
+
+Créer `src/web/refactored/calculator-logic.test.ts` :
+
+```typescript
+import { describe, it, expect } from 'vitest';
+import { detectError, formatResult, validateExpression } from './calculator-logic';
+
+describe('detectError', () => {
+  it('should detect division by zero as error', () => {
+    expect(detectError(0, "10 / 0")).toBe(true);
+  });
+
+  it('should not detect error for valid zero result', () => {
+    expect(detectError(0, "0")).toBe(false);
+  });
+});
+
+describe('formatResult', () => {
+  it('should format error result', () => {
+    const result = formatResult(0, true);
+    expect(result.text).toBe('❌ Erreur: 0');
+    expect(result.className).toBe('error');
+  });
+});
+```
+
+**Avantage** : Tests rapides (~1ms), sans DOM, sans navigateur !
 
 ## 💡 Message clé
 

@@ -2,13 +2,18 @@
   "name": "demo-qualite-calculatrice",
   "version": "1.0.0",
   "description": "Projet legacy pour formation qualité logicielle - Fonction monstrueuse",
-  "main": "dist/calculator.js",
+  "main": "dist/calculator/calculator.js",
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "start": "npm run build && node dist/calculator.js",
-    "dev": "nodemon --watch src --ext ts --exec \"npm run build && node dist/calculator.js\"",
-    "examples": "npm run build && node dist/examples.js",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage",
+    "start": "npm run build && node dist/calculator/calculator.js",
+    "start:web": "npm run build && npx http-server . -p 8080 -o /public/index-legacy.html",
+    "dev": "nodemon --watch src --ext ts --exec \"npm run build && node dist/calculator/calculator.js\"",
+    "dev:web": "nodemon --watch src --ext ts,html --exec \"npm run build && npx http-server . -p 8080\"",
+    "examples": "npm run build && node dist/calculator/examples.js",
     "clean": "rm -rf dist"
   },
   "keywords": [
@@ -22,7 +27,11 @@
   "license": "ISC",
   "devDependencies": {
     "@types/node": "25.0.3",
+    "@vitest/coverage-v8": "^4.0.16",
+    "@vitest/ui": "^4.0.16",
+    "http-server": "^14.1.1",
     "nodemon": "3.1.11",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "vitest": "^4.0.16"
   }
 }
