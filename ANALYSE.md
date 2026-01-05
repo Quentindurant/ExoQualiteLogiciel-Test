@@ -21,9 +21,9 @@ Analysez le fichier `src/calculator.ts` et identifiez tous les défauts du code 
 
 | Variable/Fonction | Problème | Suggestion |
 |-------------------|----------|------------|
-| | | |
-| | | |
-| | | |
+| a, b, c | n'est pas compréhensible a première vue | lui donner le nom de ce quel fais  |
+| res, tmp , nums, ops,  arr, st, idx, flag, err | variable générique mais on ne sait pas leurs utiliter | lui donner le nom de ce quel fais |
+| x, y, z,| correspond a des coordonners ?| là aussi lui donners des nom plus explicite |
 
 ---
 

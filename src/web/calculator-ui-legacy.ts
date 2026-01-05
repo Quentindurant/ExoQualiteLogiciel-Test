@@ -1,4 +1,4 @@
-import { calc } from '../calculator/calculator.js';
+import { calcule } from '../calculator/calculator.js';
 
 let calculationCount = 0;
 let lastResult: number | null = null;
@@ -25,7 +25,7 @@ function handleCalculation() {
     return;
   }
 
-  const result = calc(expression);
+  const result = calcule(expression);
 
   const isError = result === 0 && expression !== "0" && !expression.includes("0 / 0");
 

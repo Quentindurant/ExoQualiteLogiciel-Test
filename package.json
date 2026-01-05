@@ -10,11 +10,15 @@
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
     "start": "npm run build && node dist/calculator/calculator.js",
-    "start:web": "npm run build && npx http-server . -p 8080 -o /public/index-legacy.html",
+    "start:web": "npm run build && npx http-server . -p 8081 -o /public/index-legacy.html",
     "dev": "nodemon --watch src --ext ts --exec \"npm run build && node dist/calculator/calculator.js\"",
-    "dev:web": "nodemon --watch src --ext ts,html --exec \"npm run build && npx http-server . -p 8080\"",
+    "dev:web": "nodemon --watch src --ext ts,html --exec \"npm run build && npx http-server . -p 8081\"",
     "examples": "npm run build && node dist/calculator/examples.js",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "lint": "eslint src --fix",
+    "format": "prettier --write src/**/*.ts",
+    "lint:fix": "npm run lint -- --fix",
+    "check": "npm run lint && npm run format"
   },
   "keywords": [
     "legacy",
